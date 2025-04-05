@@ -2,125 +2,182 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Cetus {
-    code: i64,
-    msg: String,
-    data: Data,
+    pub code: i64,
+    pub msg: String,
+    pub data: Data,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Data {
-    total: i64,
-    lp_list: Vec<LpList>,
+    pub total: i64,
+    pub lp_list: Vec<LpList>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct LpList {
-    symbol: String,
-    name: String,
-    decimals: i64,
-    fee: String,
-    tick_spacing: String,
-    pool_type: String,
-    address: String,
-    coin_a_address: String,
-    coin_b_address: String,
-    project_url: String,
-    is_display_rewarder: bool,
-    is_closed: bool,
-    rewarder_display1: bool,
-    rewarder_display2: bool,
-    rewarder_display3: bool,
-    rewarder_display4: bool,
-    rewarder_display5: bool,
-    labels: Option<serde_json::Value>,
-    coin_a: Coin,
-    coin_b: Coin,
-    price: String,
-    rewarder_usd: Vec<Option<serde_json::Value>>,
-    rewarder_apr: Vec<RewarderApr>,
-    is_forward: bool,
-    price_range_config: Option<serde_json::Value>,
-    object: Object,
-    category: String,
-    is_vaults: bool,
-    stable_farming: StableFarming,
-    vaults: Option<serde_json::Value>,
-    pure_tvl_in_usd: String,
+    pub symbol: String,
+    pub name: String,
+    pub decimals: i64,
+    pub fee: String,
+    pub tick_spacing: String,
+    pub pool_type: PoolType,
+    pub address: String,
+    pub coin_a_address: String,
+    pub coin_b_address: String,
+    pub project_url: String,
+    pub is_display_rewarder: bool,
+    pub is_closed: bool,
+    pub rewarder_display1: bool,
+    pub rewarder_display2: bool,
+    pub rewarder_display3: bool,
+    pub rewarder_display4: bool,
+    pub rewarder_display5: bool,
+    pub labels: Option<Vec<Option<serde_json::Value>>>,
+    pub coin_a: Coin,
+    pub coin_b: Coin,
+    pub price: String,
+    pub rewarder_usd: Vec<String>,
+    pub rewarder_apr: Vec<String>,
+    pub is_forward: bool,
+    pub price_range_config: Option<serde_json::Value>,
+    pub object: Object,
+    pub category: String,
+    pub is_vaults: bool,
+    pub stable_farming: Option<StableFarming>,
+    pub vaults: Option<Vec<String>>,
+    pub pure_tvl_in_usd: String,
     #[serde(rename = "vol_in_usd_24h")]
-    vol_in_usd_24_h: String,
+    pub vol_in_usd_24_h: String,
     #[serde(rename = "fee_24_h")]
-    fee_24__h: String,
-    total_apr: String,
-    apr: Apr,
-    extensions: Option<serde_json::Value>,
-    has_mining: bool,
-    has_farming: bool,
-    no_incentives: bool,
+    pub fee_24__h: String,
+    pub total_apr: String,
+    pub apr: Apr,
+    pub extensions: Option<Extensions>,
+    pub has_mining: bool,
+    pub has_farming: bool,
+    pub no_incentives: bool,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Apr {
     #[serde(rename = "fee_apr_24h")]
-    fee_apr_24_h: String,
+    pub fee_apr_24_h: String,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Coin {
-    name: String,
-    symbol: String,
-    decimals: i64,
-    address: String,
-    balance: String,
-    logo_url: String,
-    coingecko_id: String,
-    project_url: String,
-    labels: Vec<String>,
-    is_trusted: bool,
+    pub name: String,
+    pub symbol: String,
+    pub decimals: i64,
+    pub address: String,
+    pub balance: String,
+    pub logo_url: String,
+    pub coingecko_id: String,
+    pub project_url: String,
+    pub labels: Vec<Label>,
+    pub is_trusted: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum Label {
+    Wormhole,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Extensions {
+    pub show_rewarder_4: Option<String>,
+    pub show_rewarder_5: Option<String>,
+    pub zap: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Object {
-    coin_a: i64,
-    coin_b: i64,
-    tick_spacing: i64,
-    fee_rate: i64,
-    liquidity: String,
-    current_sqrt_price: String,
-    rewarder_manager: RewarderManager,
-    is_pause: bool,
-    index: i64,
+    pub coin_a: f64,
+    pub coin_b: i64,
+    pub tick_spacing: i64,
+    pub fee_rate: i64,
+    pub liquidity: String,
+    pub current_sqrt_price: String,
+    pub rewarder_manager: RewarderManager,
+    pub is_pause: bool,
+    pub index: i64,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct RewarderManager {
-    fields: Fields,
+    pub fields: RewarderManagerFields,
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Fields {
-    rewarders: Vec<Option<serde_json::Value>>,
-    points_released: String,
-    points_growth_global: String,
-    last_updated_time: i64,
+pub struct RewarderManagerFields {
+    pub rewarders: Vec<Rewarder>,
+    pub points_released: String,
+    pub points_growth_global: String,
+    pub last_updated_time: i64,
 }
 
 #[derive(Serialize, Deserialize)]
-pub enum RewarderApr {
-    #[serde(rename = "0%")]
-    The0,
+pub struct Rewarder {
+    pub fields: RewarderFields,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct RewarderFields {
+    pub reward_coin: RewardCoin,
+    pub emissions_per_second: String,
+    pub growth_global: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct RewardCoin {
+    pub fields: RewardCoinFields,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct RewardCoinFields {
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PoolType {
+    #[serde(rename = "")]
+    Empty,
+    Unstable,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct StableFarming {
-    stable_farming_pool: String,
-    is_show_rewarder: bool,
-    show_rewarder_1: bool,
-    show_rewarder_2: bool,
-    show_rewarder_3: bool,
-    tvl: String,
-    apr: String,
-    effective_tick_lower: i64,
-    effective_tick_upper: i64,
-    total_wrapped_amount: String,
-    stable_rewarder: Option<serde_json::Value>,
+    pub stable_farming_pool: String,
+    pub is_show_rewarder: bool,
+    pub show_rewarder_1: bool,
+    pub show_rewarder_2: bool,
+    pub show_rewarder_3: bool,
+    pub tvl: String,
+    pub apr: String,
+    pub effective_tick_lower: i64,
+    pub effective_tick_upper: i64,
+    pub total_wrapped_amount: TotalWrappedAmount,
+    pub stable_rewarder: Option<Vec<StableRewarder>>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct StableRewarder {
+    pub apr: String,
+    pub coin: String,
+    pub amount_second: String,
+    pub amount_usd: String,
+    pub symbol: String,
+    pub name: String,
+    pub decimals: i64,
+    #[serde(rename = "logoURI")]
+    pub logo_uri: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum TotalWrappedAmount {
+    #[serde(rename = "")]
+    Empty,
+    #[serde(rename = "1693687749723846")]
+    The1693687749723846,
 }
