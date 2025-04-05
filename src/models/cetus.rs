@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
-pub struct Welcome {
+pub struct Cetus {
     code: i64,
     msg: String,
     data: Data,
