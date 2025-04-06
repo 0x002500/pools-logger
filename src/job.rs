@@ -19,6 +19,15 @@ struct PoolsCollection {
     pools: Vec<PoolInfo>,
 }
 
+fn writer(pools_collection: &PoolsCollection, path: &str) -> Result<()> {
+    let file = File::create(path)?;
+    let buf_writer = BufWriter::with_capacity(128 * 1024, file);
+
+    serde_json::to_writer(buf_writer, pools_collection)?;
+
+    Ok(())
+}
+
 fn cetus() -> PoolsCollection {
     let mut pools_collection: PoolsCollection = PoolsCollection { pools: Vec::new() };
     let pools: Cetus = req_cetus::get_pools();
@@ -52,4 +61,11 @@ fn turbos() -> PoolsCollection {
         pools_collection.pools.push(pool_info);
     }
     pools_collection
+}
+
+pub fn job() -> Result<()> {
+    let cetus_pools: PoolsCollection = cetus();
+    let turbos_pools: PoolsCollection = turbos();
+
+    Ok(())
 }
