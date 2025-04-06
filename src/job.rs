@@ -26,7 +26,7 @@ fn cetus() -> PoolsCollection {
         let pool_info: PoolInfo = PoolInfo {
             symbol: pool.symbol,
             total_apr: pool.total_apr,
-            liquidity: pool.object.liquidity,
+            liquidity: pool.pure_tvl_in_usd,
             vol_in_usd_24_h: pool.vol_in_usd_24_h,
             fee_24_h: pool.fee_24__h,
         };
@@ -36,4 +36,6 @@ fn cetus() -> PoolsCollection {
     pools_collection
 }
 
-fn turbos() {}
+fn turbos() {
+
+}
