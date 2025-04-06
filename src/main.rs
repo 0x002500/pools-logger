@@ -1,7 +1,11 @@
 use env_logger::{Builder, Env};
+use job::job;
 use log::{info, LevelFilter};
 use std::io::Write;
 use chrono::Local;
+use clokwerk::{Scheduler, TimeUnits};
+use std::thread;
+use std::time::Duration;
 
 fn init_logger() {
     Builder::from_env(Env::default())
@@ -31,5 +35,17 @@ mod job;
 
 fn main() {
     init_logger();
+    let mut scheduler = Scheduler::new();
+
+    scheduler.every(10.minutes()).run(|| {
+        if let Err(e) = job::job() {
+            log::error!("Job execution failed: {}", e);
+        }
+    });
+
     info!("Starting the application...");
+    loop {
+        scheduler.run_pending();
+        thread::sleep(Duration::from_millis(1000));
+    }
 }

@@ -4,8 +4,9 @@ use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{BufWriter, Result};
 use serde_json;
+use chrono::Local;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 struct PoolInfo {
     symbol: String,
     total_apr: String,
@@ -19,9 +20,9 @@ struct PoolsCollection {
     pools: Vec<PoolInfo>,
 }
 
-fn writer(pools_collection: &PoolsCollection, path: &str) -> Result<()> {
+fn write_to_file(pools_collection: &PoolsCollection, path: &str) -> Result<()> {
     let file = File::create(path)?;
-    let buf_writer = BufWriter::with_capacity(128 * 1024, file);
+    let buf_writer = BufWriter::with_capacity(4 * 1024 * 1024, file);
 
     serde_json::to_writer(buf_writer, pools_collection)?;
 
@@ -66,6 +67,14 @@ fn turbos() -> PoolsCollection {
 pub fn job() -> Result<()> {
     let cetus_pools: PoolsCollection = cetus();
     let turbos_pools: PoolsCollection = turbos();
+    let pools_collection: PoolsCollection = PoolsCollection {
+        pools: [cetus_pools.pools.clone(), turbos_pools.pools.clone()].concat(),
+    };
+
+    let local_time = Local::now();
+    let timestamp = local_time.format("%Y-%m-%d %H:%M:%S%.3f").to_string();
+    let path: String = format!("./data/{}.json", timestamp);
+    write_to_file(&pools_collection, &path)?;
 
     Ok(())
 }
