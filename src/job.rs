@@ -36,6 +36,20 @@ fn cetus() -> PoolsCollection {
     pools_collection
 }
 
-fn turbos() {
+fn turbos() -> PoolsCollection {
+    let mut pools_collection: PoolsCollection = PoolsCollection { pools: Vec::new() };
+    let pools: Turbos = req_turbos::get_pools();
+    for pool in pools.data.list {
+        let symbol: String = format!("{}-{}", pool.coin_symbol_a, pool.coin_symbol_b);
+        let pool_info: PoolInfo = PoolInfo {
+            symbol: symbol,
+            total_apr: pool.apr.to_string(),
+            liquidity: pool.liquidity_usd.to_string(),
+            vol_in_usd_24_h: pool.volume_24_h_usd.to_string(),
+            fee_24_h: pool.fee_24_h_usd.to_string(),
+        };
 
+        pools_collection.pools.push(pool_info);
+    }
+    pools_collection
 }
