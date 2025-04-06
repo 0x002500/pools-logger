@@ -27,6 +27,7 @@ fn init_logger() {
 
 mod request;
 mod models;
+mod job;
 
 fn main() {
     init_logger();
