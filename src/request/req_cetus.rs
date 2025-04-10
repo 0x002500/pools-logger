@@ -1,18 +1,44 @@
-use log::info;
+use log::{error, info};
 use crate::models::cetus::Cetus;
+use reqwest::blocking::Client;
+use std::error::Error;
 
-fn get_pools_amount() -> i64 {
-    let api_url: &str = "https://api-sui.cetus.zone/v2/sui/stats_pools?is_vaults=false&display_all_pools=false&has_mining=true&has_farming=true&no_incentives=true&order_by=-totalApr&limit=1&offset=0&coin_type&pool";
-    info!("Getting the number of pools from Cetus API");
-    let response: String = reqwest::blocking::get(api_url).unwrap().text().unwrap();
-    let pools: Cetus = serde_json::from_str(&response).unwrap();
-    pools.data.total
+fn get_pools_amount() -> Result<i64, Box<dyn Error>> {
+    let api_url = "https://api-sui.cetus.zone/v2/sui/stats_pools?is_vaults=false&display_all_pools=false&has_mining=true&has_farming=true&no_incentives=true&order_by=-totalApr&limit=1&offset=0&coin_type&pool";
+    info!("Getting the number of pools from Cetus's API");
+
+    let client = Client::new();
+    let response = client.get(api_url).send()?;
+
+    if !response.status().is_success() {
+        error!("Error handel, Status Code: {}", response.status());
+        return Err(format!("Error handel, Status Code: {}", response.status()).into());
+    }
+
+    let response_text = response.text()?;
+    let pools: Cetus = serde_json::from_str(&response_text)?;
+
+    Ok(pools.data.total)
 }
 
-pub fn get_pools() -> Cetus {
-    let api_url: String = format!("https://api-sui.cetus.zone/v2/sui/stats_pools?is_vaults=false&display_all_pools=false&has_mining=true&has_farming=true&no_incentives=true&order_by=-totalApr&limit={}&offset=0&coin_type&pool", get_pools_amount());
-    info!("Getting the pools data from Cetus API");
-    let response: String = reqwest::blocking::get(api_url).unwrap().text().unwrap();
-    let pools: Cetus = serde_json::from_str(&response).unwrap();
-    pools
+pub fn get_pools() -> Result<Cetus, Box<dyn Error>> {
+    let total_pools = get_pools_amount()?;
+    let api_url = format!(
+        "https://api-sui.cetus.zone/v2/sui/stats_pools?is_vaults=false&display_all_pools=false&has_mining=true&has_farming=true&no_incentives=true&order_by=-totalApr&limit={}&offset=0&coin_type&pool",
+        total_pools
+    );
+    info!("Getting data from Cetus's API");
+
+    let client = Client::new();
+    let response = client.get(&api_url).send()?;
+
+    if !response.status().is_success() {
+        error!("Error handel, Status Code: {}", response.status());
+        return Err(format!("Error handel, Status Code: {}", response.status()).into());
+    }
+
+    let response_text = response.text()?;
+    let pools: Cetus = serde_json::from_str(&response_text)?;
+
+    Ok(pools)
 }
