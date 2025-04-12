@@ -1,4 +1,4 @@
-use crate::models::{turbos::Turbos};
+use crate::models::turbos::Turbos;
 use crate::request::{req_cetus, req_turbos};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -6,10 +6,11 @@ use std::fs::OpenOptions;
 use std::io::{self, BufWriter, Result, Write};
 use serde_json;
 use chrono::Local;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 #[derive(Serialize, Deserialize, Clone)]
 struct PoolInfo {
+    source: String,
     symbol: String,
     total_apr: String,
     liquidity: String,
@@ -43,11 +44,12 @@ fn cetus() -> PoolsCollection {
         Ok(pools) => {
             for pool in pools.data.lp_list {
                 let pool_info = PoolInfo {
+                    source: "Cetus".to_string(),
                     symbol: pool.symbol,
                     total_apr: pool.total_apr,
                     liquidity: pool.pure_tvl_in_usd,
                     vol_in_usd_24_h: pool.vol_in_usd_24_h,
-                    fee_24_h: pool.fee_24__h, // 注意：可考虑更正字段名
+                    fee_24_h: pool.fee_24_h,
                 };
                 pools_collection.pools.push(pool_info);
             }
@@ -63,6 +65,7 @@ fn turbos() -> PoolsCollection {
     for pool in pools.data.list {
         let symbol = format!("{}-{}", pool.coin_symbol_a, pool.coin_symbol_b);
         let pool_info = PoolInfo {
+            source: "Turbos".to_string(),
             symbol,
             total_apr: pool.apr.to_string(),
             liquidity: pool.liquidity_usd.to_string(),
