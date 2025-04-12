@@ -1,5 +1,4 @@
 use env_logger::{Builder, Env};
-use job::job;
 use log::{info, LevelFilter};
 use std::io::Write;
 use chrono::Local;
@@ -16,7 +15,6 @@ fn init_logger() {
             let level = record.level();
             let args = record.args();
 
-            // 根据级别使用不同的颜色
             match level {
                 log::Level::Error => writeln!(buf, "\x1B[31m[{}] ERROR: {}\x1B[0m", timestamp, args),
                 log::Level::Warn => writeln!(buf, "\x1B[33m[{}] WARN: {}\x1B[0m", timestamp, args),
@@ -37,7 +35,7 @@ fn main() {
     init_logger();
     let mut scheduler = Scheduler::new();
 
-    scheduler.every(10.minutes()).run(|| {
+    scheduler.every(5.minutes()).run(|| {
         if let Err(e) = job::job() {
             log::error!("Job execution failed: {}", e);
         }
@@ -46,6 +44,6 @@ fn main() {
     info!("Starting the application...");
     loop {
         scheduler.run_pending();
-        thread::sleep(Duration::from_millis(1000));
+        thread::sleep(Duration::from_millis(10000));
     }
 }
