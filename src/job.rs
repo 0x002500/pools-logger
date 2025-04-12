@@ -1,4 +1,3 @@
-use crate::models::turbos::Turbos;
 use crate::request::{req_cetus, req_turbos};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -61,18 +60,22 @@ fn cetus() -> PoolsCollection {
 
 fn turbos() -> PoolsCollection {
     let mut pools_collection = PoolsCollection { pools: Vec::new() };
-    let pools: Turbos = req_turbos::get_pools();
-    for pool in pools.data.list {
-        let symbol = format!("{}-{}", pool.coin_symbol_a, pool.coin_symbol_b);
-        let pool_info = PoolInfo {
-            source: "Turbos".to_string(),
-            symbol,
-            total_apr: pool.apr.to_string(),
-            liquidity: pool.liquidity_usd.to_string(),
-            vol_in_usd_24_h: pool.volume_24_h_usd.to_string(),
-            fee_24_h: pool.fee_24_h_usd.to_string(),
-        };
-        pools_collection.pools.push(pool_info);
+    match req_turbos::get_pools() {
+        Ok(pools) => {
+            for pool in pools.data.list {
+                let symbol = format!("{}-{}", pool.coin_symbol_a, pool.coin_symbol_b);
+                let pool_info = PoolInfo {
+                    source: "Turbos".to_string(),
+                    symbol,
+                    total_apr: pool.apr.to_string(),
+                    liquidity: pool.liquidity_usd.to_string(),
+                    vol_in_usd_24_h: pool.volume_24_h_usd.to_string(),
+                    fee_24_h: pool.fee_24_h_usd.to_string(),
+                };
+                pools_collection.pools.push(pool_info);
+            }
+        }
+        Err(e) => eprintln!("获取池数据时出错: {}", e),
     }
     pools_collection
 }
