@@ -84,7 +84,7 @@ pub struct LpList {
     pub vol_in_usd_24_h: String,
 
     #[serde(rename = "fee_24_h")]
-    pub fee_24__h: String,
+    pub fee_24_h: String,
 
     pub total_apr: String,
 
