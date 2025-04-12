@@ -1,4 +1,5 @@
 use crate::request::{req_cetus, req_turbos};
+use log::info;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::OpenOptions;
@@ -89,7 +90,7 @@ pub fn job() -> Result<()> {
 
     let local_time: chrono::DateTime<Local> = Local::now();
     let timestamp: String = local_time.format("%Y-%m-%d_%H-%M-%S_%3f").to_string();
-
+    info!("Writing into the file");
     write_to_file(&pools_collection, &timestamp)?;
     Ok(())
 }
