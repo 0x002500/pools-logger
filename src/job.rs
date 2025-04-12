@@ -23,26 +23,26 @@ struct PoolsCollection {
 }
 
 fn write_to_file(pools_collection: &PoolsCollection, timestamp: &str) -> io::Result<()> {
-    let mut path = PathBuf::from("data");
+    let mut path: PathBuf = PathBuf::from("data");
     fs::create_dir_all(&path)?;
     path.push(format!("{}.json", timestamp));
 
-    let file = OpenOptions::new()
+    let file: fs::File = OpenOptions::new()
         .write(true)
         .create(true)
         .open(&path)?;
-    let mut buf_writer = BufWriter::new(file);
+    let mut buf_writer: BufWriter<fs::File> = BufWriter::new(file);
     serde_json::to_writer(&mut buf_writer, pools_collection)?;
     buf_writer.flush()?;
     Ok(())
 }
 
 fn cetus() -> PoolsCollection {
-    let mut pools_collection = PoolsCollection { pools: Vec::new() };
+    let mut pools_collection: PoolsCollection = PoolsCollection { pools: Vec::new() };
     match req_cetus::get_pools() {
         Ok(pools) => {
             for pool in pools.data.lp_list {
-                let pool_info = PoolInfo {
+                let pool_info: PoolInfo = PoolInfo {
                     source: "Cetus".to_string(),
                     symbol: pool.symbol,
                     total_apr: pool.total_apr,
@@ -59,12 +59,12 @@ fn cetus() -> PoolsCollection {
 }
 
 fn turbos() -> PoolsCollection {
-    let mut pools_collection = PoolsCollection { pools: Vec::new() };
+    let mut pools_collection: PoolsCollection = PoolsCollection { pools: Vec::new() };
     match req_turbos::get_pools() {
         Ok(pools) => {
             for pool in pools.data.list {
-                let symbol = format!("{}-{}", pool.coin_symbol_a, pool.coin_symbol_b);
-                let pool_info = PoolInfo {
+                let symbol: String = format!("{}-{}", pool.coin_symbol_a, pool.coin_symbol_b);
+                let pool_info: PoolInfo = PoolInfo {
                     source: "Turbos".to_string(),
                     symbol,
                     total_apr: pool.apr.to_string(),
@@ -81,14 +81,14 @@ fn turbos() -> PoolsCollection {
 }
 
 pub fn job() -> Result<()> {
-    let cetus_pools = cetus();
-    let turbos_pools = turbos();
-    let pools_collection = PoolsCollection {
+    let cetus_pools: PoolsCollection = cetus();
+    let turbos_pools: PoolsCollection = turbos();
+    let pools_collection: PoolsCollection = PoolsCollection {
         pools: [cetus_pools.pools.clone(), turbos_pools.pools.clone()].concat(),
     };
 
-    let local_time = Local::now();
-    let timestamp = local_time.format("%Y-%m-%d_%H-%M-%S_%3f").to_string();
+    let local_time: chrono::DateTime<Local> = Local::now();
+    let timestamp: String = local_time.format("%Y-%m-%d_%H-%M-%S_%3f").to_string();
 
     write_to_file(&pools_collection, &timestamp)?;
     Ok(())
