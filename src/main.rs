@@ -8,12 +8,12 @@ use std::time::Duration;
 
 fn init_logger() {
     Builder::from_env(Env::default())
-        .format(|buf, record| {
-            let local_time = Local::now();
-            let timestamp = local_time.format("%Y-%m-%d %H:%M:%S%.3f").to_string();
+        .format(|buf: &mut env_logger::fmt::Formatter, record: &log::Record<'_>| {
+            let local_time: chrono::DateTime<Local> = Local::now();
+            let timestamp: String = local_time.format("%Y-%m-%d %H:%M:%S%.3f").to_string();
 
-            let level = record.level();
-            let args = record.args();
+            let level: log::Level = record.level();
+            let args: &std::fmt::Arguments<'_> = record.args();
 
             match level {
                 log::Level::Error => writeln!(buf, "\x1B[31m[{}] ERROR: {}\x1B[0m", timestamp, args),
@@ -33,7 +33,7 @@ mod job;
 
 fn main() {
     init_logger();
-    let mut scheduler = Scheduler::new();
+    let mut scheduler: Scheduler = Scheduler::new();
 
     scheduler.every(5.minutes()).run(|| {
         if let Err(e) = job::job() {
